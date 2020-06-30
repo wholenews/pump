@@ -61,12 +61,12 @@ var pump = function () {
   var callback = isFn(streams[streams.length - 1] || noop) && streams.pop() || noop
 
   if (Array.isArray(streams[0])) streams = streams[0]
-  if (streams.length < 2) throw new Error('pump requires two streams per minimum')
+  if (streams.length < 1) throw new Error('pump requires a stream')
 
   var error
   var destroys = streams.map(function (stream, i) {
-    var reading = i < streams.length - 1
-    var writing = i > 0
+    var reading = streams.length == 1 ? streams[0].readable : i < streams.length - 1
+    var writing = streams.length == 1 ? streams[0].writable : i > 0
     return destroyer(stream, reading, writing, function (err) {
       if (!error) error = err
       if (err) destroys.forEach(call)
